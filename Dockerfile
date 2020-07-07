@@ -1,38 +1,71 @@
-FROM phusion/baseimage:0.11
+FROM phusion/baseimage:18.04-1.0.0
 
-ENV WEEWX_VERSION=4.0.0
 ENV HOME=/home/weewx
 
-RUN apt-get -y update
+# current versions
+ENV WEEWX_VERSION=4.1.1
+ENV BELCHERTOWN_VERSION=1.1
 
+# download URLs
+ENV WEEWX_URL=http://weewx.com/downloads/weewx-$WEEWX_VERSION.tar.gz
+ENV BELCHERTOWN_URL=https://github.com/poblabs/weewx-belchertown/releases/download/weewx-belchertown-$BELCHERTOWN_VERSION/weewx-belchertown-release-$BELCHERTOWN_VERSION.tar.gz
+ENV INFLUX_URL=https://github.com/matthewwall/weewx-influx/archive/master.zip
+ENV SFTP_URL=https://github.com/matthewwall/weewx-sftp/archive/master.zip
+ENV MQTT_URL=https://github.com/matthewwall/weewx-mqtt/archive/master.zip
+ENV WEATHERBUG_URL=https://github.com/matthewwall/weewx-wbug/archive/master.zip
+ENV WEATHERCLOUD_URL=https://github.com/matthewwall/weewx-wcloud/archive/master.zip
+ENV WINDY_URL=https://github.com/matthewwall/weewx-windy/archive/master.zip
+ENV SDR_URL=https://github.com/matthewwall/weewx-sdr/archive/master.zip
+ENV BME280_URL=https://gitlab.com/wjcarpenter/bme280wx/-/archive/master/bme280wx-master.zip
+
+# make sure system is up to date
+RUN apt-get -y update
 RUN apt-get install -y apt-utils
 
-ENV TZ=America/New_York
+# set timezone
+ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# debian, ubuntu, mint, raspbian
-# for systems that do not have python 3 installed (for example, ubuntu 18.04 and later):
-RUN apt-get install -y python3 python3-pip python3-configobj python3-serial python3-mysqldb python3-usb
-RUN pip3 install Cheetah3 Pillow-PIL pyephem setuptools
-RUN apt-get install -y default-mysql-client
-RUN apt-get install -y sqlite3 curl rsync ssh tzdata wget gftp syslog-ng
+# install requirements
+RUN apt-get install -y python3 python3-pip python3-configobj python3-serial python3-usb python3-paho-mqtt python3-dnspython python3-cheetah python3-ephem python3-smbus
+RUN pip3 install Pillow-PIL setuptools bme280 smbus2 RPi.bme280 Rpi.GPIO pysftp
+RUN apt-get install -y sqlite3 curl rsync ssh tzdata wget gftp syslog-ng rtl-sdr rtl-433 i2c-tools
 RUN ln -f -s /usr/bin/python3 /usr/bin/python
 RUN mkdir /var/log/weewx
-
-RUN apt-get -y install xtide xtide-data
 RUN pip3 install requests
 
-# for the mongo extension
-#RUN pip install pymongo
-RUN pip3 install dnspython
-
-RUN pip3 install paho-mqtt
-RUN pip3 install configobj
-
 # install weewx from source
-ADD dist/weewx-$WEEWX_VERSION /tmp/
-RUN cd /tmp && ./setup.py build
-RUN cd /tmp && echo "tom.org simulator\n1211, foot\n44.491\n-71.689\nn\nus\n3\n" | ./setup.py install
+RUN cd /tmp
+RUN wget $WEEWX_URL -O weewx.tar.gz
+RUN tar xvf weewx.tar.gz
+RUN cd weewx-$WEEWX_VERSION
+RUN ./setup.py install  --no-prompt -O2
+
+# download weewx extensions
+RUN cd /tmp
+RUN wget -O /tmp/weewx-belchertown.tgz $BELCHERTOWN_URL
+RUN wget -O /tmp/weewx-influx.zip $INFLUX_URL
+RUN wget -O /tmp/weewx-sftp.zip $SFTP_URL
+RUN wget -O /tmp/weewx-mqtt.zip $MQTT_URL
+RUN wget -O /tmp/weewx-wbug.zip $WEATHERBUG_URL
+RUN wget -O /tmp/weewx-wcloud.zip $WEATHERCLOUD_URL
+RUN wget -O /tmp/weewx-windy.zip $WINDY_URL
+RUN wget -O /tmp/weewx-sdr.zip $SDR_URL
+RUN wget -O /tmp/weewx-bme280wx.zip $BME280_URL
+
+# install weewx extensions
+RUN bin/wee_extension --install /tmp/weewx-belchertown.tgz
+RUN bin/wee_extension --install /tmp/weewx-influx.zip
+RUN bin/wee_extension --install /tmp/weewx-sftp.zip
+RUN bin/wee_extension --install /tmp/weewx-mqtt.zip
+RUN bin/wee_extension --install /tmp/weewx-wbug.zip
+RUN bin/wee_extension --install /tmp/weewx-wcloud.zip
+RUN bin/wee_extension --install /tmp/weewx-windy.zip
+RUN bin/wee_extension --install /tmp/weewx-sdr.zip
+RUN bin/wee_extension --install /tmp/weewx-bme280wx.zip
+
+# clear out install files
+RUN rm -rf /tmp/*
 
 RUN mkdir /home/weewx/tmp
 RUN mkdir /home/weewx/public_html
