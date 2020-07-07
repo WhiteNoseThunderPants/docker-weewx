@@ -64,18 +64,23 @@ RUN bin/wee_extension --install /tmp/weewx-windy.zip
 RUN bin/wee_extension --install /tmp/weewx-sdr.zip
 RUN bin/wee_extension --install /tmp/weewx-bme280wx.zip
 
-# clear out install files
-RUN rm -rf /tmp/*
-
+# create weewx directories
 RUN mkdir /home/weewx/tmp
 RUN mkdir /home/weewx/public_html
+RUN mkdir /home/weewx/config
 
+# copy conf file to better directory for volume mapping
+RUN cp /home/weewx/weewx.conf /home/weewx/config/
+
+# create service directory
 RUN mkdir -p /etc/service/weewx
 
+# copy run file to service directory and set permissions
 ADD bin/run /etc/service/weewx/
 RUN chmod 755 /etc/service/weewx/run
 
+# clean up install files
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# run the container
 CMD ["/sbin/my_init"]
-
