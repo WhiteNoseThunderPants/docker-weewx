@@ -19,7 +19,8 @@ ENV SDR_URL=https://github.com/matthewwall/weewx-sdr/archive/master.zip
 ENV BME280_URL=https://gitlab.com/wjcarpenter/bme280wx/-/archive/master/bme280wx-master.zip
 
 # make sure system is up to date
-RUN apt-get update -y
+RUN apt-get update
+RUN apt-get upgrade -y
 RUN apt-get install -y apt-utils
 
 # set timezone
