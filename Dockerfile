@@ -1,4 +1,4 @@
-FROM phusion/baseimage:focal-1.0.0alpha1
+FROM phusion/baseimage:focal-1.0.0alpha1-arm64
 
 ENV HOME=/home/weewx
 
