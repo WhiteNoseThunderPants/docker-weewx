@@ -37,9 +37,9 @@ RUN pip3 install requests
 
 # install weewx from source
 RUN cd /tmp
-RUN wget http://weewx.com/downloads/weewx-4.1.1.tar.gz -O weewx.tar.gz
+RUN wget $WEEWX_URL -O weewx.tar.gz
 RUN tar xvf weewx.tar.gz
-RUN cd weewx-4.1.1
+RUN cd weewx-$WEEWX_VERSION
 RUN ./setup.py install --no-prompt -O2
 
 # download weewx extensions
