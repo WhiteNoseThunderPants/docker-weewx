@@ -40,8 +40,7 @@ RUN cd /tmp
 RUN wget $WEEWX_URL -O weewx.tar.gz
 RUN tar xvf weewx.tar.gz
 RUN cd weewx-$WEEWX_VERSION
-RUN python ./setup.py build
-RUN python ./setup.py install --no-prompt -O2
+RUN python /tmp/weewx-$WEEWX_VERSION/setup.py install --no-prompt -O2
 
 # download weewx extensions
 RUN cd /tmp
