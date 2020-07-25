@@ -28,8 +28,8 @@ ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # install requirements
-RUN apt-get install -y python3 python3-pip python3-configobj python3-serial python3-usb python3-paho-mqtt
-RUN pip3 install cheetah pyephem Pillow-PIL setuptools bme280 smbus2 RPi.bme280 Rpi.GPIO pysftp
+RUN apt-get install -y python3 python3-pip python3-configobj python3-serial python3-usb python3-paho-mqtt python3-cheetah python3-ephem python3-setuptools
+RUN pip3 install Pillow-PIL bme280 smbus2 RPi.bme280 Rpi.GPIO pysftp
 RUN apt-get install -y sqlite3 curl rsync ssh tzdata wget gftp syslog-ng rtl-sdr rtl-433 i2c-tools
 RUN ln -f -s /usr/bin/python3 /usr/bin/python
 RUN mkdir /var/log/weewx
