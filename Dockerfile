@@ -28,8 +28,8 @@ ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # install requirements
-RUN apt-get install -y python3 python3-pip python3-configobj python3-serial python3-usb python3-paho-mqtt python3-cheetah python3-ephem python3-setuptools python3-cffi python3-wheel python3-paramiko python3-libnacl python3-nacl
-RUN pip3 install Pillow-PIL bme280 smbus2 RPi.bme280 Rpi.GPIO pysftp
+RUN apt-get install -y python3 python3-pil python3-pip python3-configobj python3-serial python3-usb python3-paho-mqtt python3-cheetah python3-ephem python3-setuptools python3-cffi python3-wheel python3-paramiko python3-libnacl python3-nacl
+RUN pip3 install bme280 smbus2 RPi.bme280 Rpi.GPIO pysftp
 RUN apt-get install -y sqlite3 curl rsync ssh tzdata wget gftp syslog-ng rtl-sdr rtl-433 i2c-tools
 RUN ln -f -s /usr/bin/python3 /usr/bin/python
 RUN mkdir /var/log/weewx
@@ -40,7 +40,7 @@ RUN cd /tmp
 RUN wget $WEEWX_URL -O weewx.tar.gz
 RUN tar xvf weewx.tar.gz
 RUN cd weewx-$WEEWX_VERSION
-RUN ./setup.py install  --no-prompt -O2
+RUN ./setup.py install --no-prompt -O2
 
 # download weewx extensions
 RUN cd /tmp
